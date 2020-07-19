@@ -41,25 +41,28 @@ Output: 5
 
 **排序**  ：时间复杂度 O(NlogN)，空间复杂度 O(1)
 
-```java
-public int findKthLargest(int[] nums, int k) {
-    Arrays.sort(nums);
-    return nums[nums.length - k];
-}
+```python3
+def findKthLargest(self, nums: List[int], k: int) -> int:
+    # 方法1： 排序法
+    nums.sort()
+    n = len(nums)
+    ans = nums[n-k]
+    return ans
 ```
 
 **堆**  ：时间复杂度 O(NlogK)，空间复杂度 O(K)。
 
-```java
-public int findKthLargest(int[] nums, int k) {
-    PriorityQueue<Integer> pq = new PriorityQueue<>(); // 小顶堆
-    for (int val : nums) {
-        pq.add(val);
-        if (pq.size() > k)  // 维护堆的大小为 K
-            pq.poll();
-    }
-    return pq.peek();
-}
+```python3
+def findKthLargest(self, nums: List[int], k: int) -> int:
+    heap = []
+    for n in nums:
+        heapq.heappush(heap,n)
+    i = 0
+    while i < len(nums) - k :
+        a = heapq.heappop(heap)  #每次heappop是heap中最小元素
+        i += 1
+            
+    return heapq.heappop(heap)
 ```
 
 **快速选择**  ：时间复杂度 O(N)，空间复杂度 O(1)
@@ -118,33 +121,21 @@ Given [1,1,1,2,2,3] and k = 2, return [1,2].
 
 把数都放到桶之后，从后向前遍历桶，最先得到的 k 个数就是出现频率最多的的 k 个数。
 
-```java
-public List<Integer> topKFrequent(int[] nums, int k) {
-    Map<Integer, Integer> frequencyForNum = new HashMap<>();
-    for (int num : nums) {
-        frequencyForNum.put(num, frequencyForNum.getOrDefault(num, 0) + 1);
-    }
-    List<Integer>[] buckets = new ArrayList[nums.length + 1];
-    for (int key : frequencyForNum.keySet()) {
-        int frequency = frequencyForNum.get(key);
-        if (buckets[frequency] == null) {
-            buckets[frequency] = new ArrayList<>();
-        }
-        buckets[frequency].add(key);
-    }
-    List<Integer> topK = new ArrayList<>();
-    for (int i = buckets.length - 1; i >= 0 && topK.size() < k; i--) {
-        if (buckets[i] == null) {
-            continue;
-        }
-        if (buckets[i].size() <= (k - topK.size())) {
-            topK.addAll(buckets[i]);
-        } else {
-            topK.addAll(buckets[i].subList(0, k - topK.size()));
-        }
-    }
-    return topK;
-}
+```python3
+def topKFrequent(self, nums: List[int], k: int) -> List[int]:
+    # refer to: https://www.youtube.com/watch?v=lm6pBga98-w
+    # 07/2020 kv
+    counts = collections.Counter(nums)
+    bucket = [ [] for _ in range(len(nums) + 1) ] #桶排序， 一个桶种放出现频率相同的item。 index starts with 1
+    
+    for n in counts.keys():
+        bucket[counts[n]].append(n) #Counter({1: 3, 2: 2, 3: 1}), 1出现3次
+        
+    ans = []
+    for i in range(len(nums), 0 , -1): # 倒叙, n ... 1, 桶中index越大，出现次数越多，所以倒叙
+        ans += bucket[i]
+        if len(ans) == k: return ans
+    return ans
 ```
 
 ## 2. 按照字符出现次数对字符串排序
@@ -165,33 +156,20 @@ Explanation:
 So 'e' must appear before both 'r' and 't'. Therefore "eetr" is also a valid answer.
 ```
 
-```java
-public String frequencySort(String s) {
-    Map<Character, Integer> frequencyForNum = new HashMap<>();
-    for (char c : s.toCharArray())
-        frequencyForNum.put(c, frequencyForNum.getOrDefault(c, 0) + 1);
-
-    List<Character>[] frequencyBucket = new ArrayList[s.length() + 1];
-    for (char c : frequencyForNum.keySet()) {
-        int f = frequencyForNum.get(c);
-        if (frequencyBucket[f] == null) {
-            frequencyBucket[f] = new ArrayList<>();
-        }
-        frequencyBucket[f].add(c);
-    }
-    StringBuilder str = new StringBuilder();
-    for (int i = frequencyBucket.length - 1; i >= 0; i--) {
-        if (frequencyBucket[i] == null) {
-            continue;
-        }
-        for (char c : frequencyBucket[i]) {
-            for (int j = 0; j < i; j++) {
-                str.append(c);
-            }
-        }
-    }
-    return str.toString();
-}
+```python3
+def frequencySort(self, s: str) -> str:
+    counts = collections.Counter(s)
+    bucket = [[] for _ in range(len(s)+1)]    #可以作为模板，初始化桶
+    
+    for char in counts.keys():                #造桶
+        bucket[counts[char]].append(char)
+    
+    ans = ''
+    for n in range(len(s), 0, -1):            #访问桶
+        if bucket[n]:
+            for c in bucket[n]:
+                ans += c * n
+    return ans
 ```
 
 # 荷兰国旗问题
@@ -216,25 +194,28 @@ Output: [0,0,1,1,2,2]
 
 题目描述：只有 0/1/2 三种颜色。
 
-```java
-public void sortColors(int[] nums) {
-    int zero = -1, one = 0, two = nums.length;
-    while (one < two) {
-        if (nums[one] == 0) {
-            swap(nums, ++zero, one++);
-        } else if (nums[one] == 2) {
-            swap(nums, --two, one);
-        } else {
-            ++one;
-        }
-    }
-}
-
-private void swap(int[] nums, int i, int j) {
-    int t = nums[i];
-    nums[i] = nums[j];
-    nums[j] = t;
-}
+```python3
+class Solution:
+    def sortColors(self, nums: List[int]) -> None:
+        """
+        Do not return anything, modify nums in-place instead.
+        设置两个头尾指针，头指针p0指向的位置是0该放置的位置，尾指针p2指向的位置是2该放置的位置。i用来遍历整个数组，碰到0把它和p0指向的数交换，碰到2把它和p2指向的数交换，碰到1继续向后遍历。有点类似快速排序的分割数组这一步
+        
+        """
+        i = 0
+        l = 0
+        r = len(nums) - 1
+        
+        while i <= r:
+            if nums[i] == 0:
+                nums[l], nums[i] = nums[i], nums[l]
+                i += 1
+                l += 1
+            elif nums[i] == 2:
+                nums[i], nums[r] = nums[r], nums[i]
+                r -= 1
+            else:
+                i += 1
 ```
 
 

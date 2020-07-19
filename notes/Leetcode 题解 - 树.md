@@ -48,11 +48,14 @@
 
 [Leetcode](https://leetcode.com/problems/maximum-depth-of-binary-tree/description/) / [力扣](https://leetcode-cn.com/problems/maximum-depth-of-binary-tree/description/)
 
-```java
-public int maxDepth(TreeNode root) {
-    if (root == null) return 0;
-    return Math.max(maxDepth(root.left), maxDepth(root.right)) + 1;
-}
+```python3
+class Solution:
+    def maxDepth(self, root: TreeNode) -> int:
+        if root is None:
+            return 0
+        l = self.maxDepth(root.left)
+        r = self.maxDepth(root.right)
+        return max(l,r) + 1
 ```
 
 ## 2. 平衡树
@@ -71,21 +74,21 @@ public int maxDepth(TreeNode root) {
 
 平衡树左右子树高度差都小于等于 1
 
-```java
-private boolean result = true;
-
-public boolean isBalanced(TreeNode root) {
-    maxDepth(root);
-    return result;
-}
-
-public int maxDepth(TreeNode root) {
-    if (root == null) return 0;
-    int l = maxDepth(root.left);
-    int r = maxDepth(root.right);
-    if (Math.abs(l - r) > 1) result = false;
-    return 1 + Math.max(l, r);
-}
+```python3
+class Solution:
+    def isBalanced(self, root: TreeNode) -> bool:
+        self.is_balance = True
+        self.depthTree(root)
+        return self.is_balance
+    
+    def depthTree(self, root: TreeNode):
+        if root is None:
+             return 0
+        l = self.depthTree(root.left)
+        r = self.depthTree(root.right)
+        if abs(l-r) > 1:
+            self.is_balance = False
+        return max(l, r)+1
 ```
 
 ## 3. 两节点的最长路径
@@ -106,21 +109,20 @@ Input:
 Return 3, which is the length of the path [4,2,1,3] or [5,2,1,3].
 ```
 
-```java
-private int max = 0;
-
-public int diameterOfBinaryTree(TreeNode root) {
-    depth(root);
-    return max;
-}
-
-private int depth(TreeNode root) {
-    if (root == null) return 0;
-    int leftDepth = depth(root.left);
-    int rightDepth = depth(root.right);
-    max = Math.max(max, leftDepth + rightDepth);
-    return Math.max(leftDepth, rightDepth) + 1;
-}
+```python3
+class Solution:
+    def diameterOfBinaryTree(self, root: TreeNode) -> int:
+        self.max = 0
+        self.depthTree(root)
+        return self.max
+    
+    def depthTree(self, root: TreeNode):
+        if root is None:
+            return 0
+        l = self.depthTree(root.left)
+        r = self.depthTree(root.right)
+        self.max = max(self.max, l+r)
+        return max(l,r)+1
 ```
 
 ## 4. 翻转树
@@ -129,14 +131,16 @@ private int depth(TreeNode root) {
 
 [Leetcode](https://leetcode.com/problems/invert-binary-tree/description/) / [力扣](https://leetcode-cn.com/problems/invert-binary-tree/description/)
 
-```java
-public TreeNode invertTree(TreeNode root) {
-    if (root == null) return null;
-    TreeNode left = root.left;  // 后面的操作会改变 left 指针，因此先保存下来
-    root.left = invertTree(root.right);
-    root.right = invertTree(left);
-    return root;
-}
+```python
+#后续遍历二叉树
+class Solution:
+    def invertTree(self, root: TreeNode) -> TreeNode:
+        if root is None:
+            return None
+        left_tree = root.left
+        root.left = self.invertTree(root.right)
+        root.right = self.invertTree(left_tree)
+        return root
 ```
 
 ## 5. 归并两棵树
@@ -162,16 +166,20 @@ Output:
      5   4   7
 ```
 
-```java
-public TreeNode mergeTrees(TreeNode t1, TreeNode t2) {
-    if (t1 == null && t2 == null) return null;
-    if (t1 == null) return t2;
-    if (t2 == null) return t1;
-    TreeNode root = new TreeNode(t1.val + t2.val);
-    root.left = mergeTrees(t1.left, t2.left);
-    root.right = mergeTrees(t1.right, t2.right);
-    return root;
-}
+```python
+# 注意下，第二次忘了怎么做了
+class Solution:
+    def mergeTrees(self, t1: TreeNode, t2: TreeNode) -> TreeNode:
+        if t1 is None and t2 is None:
+            return None
+        if t1 and t2 is None:
+            return t1
+        if t1 is None and t2:
+            return t2
+        root = TreeNode(t1.val + t2.val)
+        root.left = self.mergeTrees(t1.left, t2.left)
+        root.right = self.mergeTrees(t1.right, t2.right) 
+        return root
 ```
 
 ## 6. 判断路径和是否等于一个数
@@ -196,12 +204,14 @@ return true, as there exist a root-to-leaf path 5->4->11->2 which sum is 22.
 
 路径和定义为从 root 到 leaf 的所有节点的和。
 
-```java
-public boolean hasPathSum(TreeNode root, int sum) {
-    if (root == null) return false;
-    if (root.left == null && root.right == null && root.val == sum) return true;
-    return hasPathSum(root.left, sum - root.val) || hasPathSum(root.right, sum - root.val);
-}
+```python3
+class Solution:
+    def hasPathSum(self, root: TreeNode, sum: int) -> bool:
+        if root is None: 
+            return False
+        if root.left is None and root.right is None and sum == root.val:
+            return True
+        return self.hasPathSum(root.left, sum - root.val) or self.hasPathSum(root.right, sum - root.val)
 ```
 
 ## 7. 统计路径和等于一个数的路径数量
@@ -230,20 +240,22 @@ Return 3. The paths that sum to 8 are:
 
 路径不一定以 root 开头，也不一定以 leaf 结尾，但是必须连续。
 
-```java
-public int pathSum(TreeNode root, int sum) {
-    if (root == null) return 0;
-    int ret = pathSumStartWithRoot(root, sum) + pathSum(root.left, sum) + pathSum(root.right, sum);
-    return ret;
-}
-
-private int pathSumStartWithRoot(TreeNode root, int sum) {
-    if (root == null) return 0;
-    int ret = 0;
-    if (root.val == sum) ret++;
-    ret += pathSumStartWithRoot(root.left, sum - root.val) + pathSumStartWithRoot(root.right, sum - root.val);
-    return ret;
-}
+```python3
+class Solution:
+    def pathSum(self, root: TreeNode, sum: int) -> int:
+        if root is None:
+            return 0
+        return self.pathSumStartWithRoot(root, sum) + self.pathSum(root.left, sum) + self.pathSum(root.right, sum)
+        
+    def pathSumStartWithRoot(self, root: TreeNode, sum: int) -> int:
+        if root is None:
+            return 0
+        count = 0
+        if root.val == sum:
+            count += 1
+        new_sum = sum - root.val
+        count = count + self.pathSumStartWithRoot(root.left, new_sum) + self.pathSumStartWithRoot(root.right, new_sum)
+        return count
 ```
 
 ## 8. 子树
@@ -285,18 +297,22 @@ Given tree t:
 Return false.
 ```
 
-```java
-public boolean isSubtree(TreeNode s, TreeNode t) {
-    if (s == null) return false;
-    return isSubtreeWithRoot(s, t) || isSubtree(s.left, t) || isSubtree(s.right, t);
-}
-
-private boolean isSubtreeWithRoot(TreeNode s, TreeNode t) {
-    if (t == null && s == null) return true;
-    if (t == null || s == null) return false;
-    if (t.val != s.val) return false;
-    return isSubtreeWithRoot(s.left, t.left) && isSubtreeWithRoot(s.right, t.right);
-}
+```python3
+class Solution:
+    def isSubtree(self, s: TreeNode, t: TreeNode) -> bool:
+        if s is None:
+            return False
+        return self.isSubtreeWithRoot(s, t) or self.isSubtree(s.left, t) or self.isSubtree(s.right, t)
+        
+    def isSubtreeWithRoot(self, s: TreeNode, t: TreeNode):
+        #三种情况
+        if s is None and t is None:
+            return True
+        if s is None or t is None:
+            return False
+        if s.val != t.val:
+            return False
+        return self.isSubtreeWithRoot(s.left, t.left) and self.isSubtreeWithRoot(s.right, t.right)
 ```
 
 ## 9. 树的对称
@@ -313,18 +329,20 @@ private boolean isSubtreeWithRoot(TreeNode s, TreeNode t) {
 3  4 4  3
 ```
 
-```java
-public boolean isSymmetric(TreeNode root) {
-    if (root == null) return true;
-    return isSymmetric(root.left, root.right);
-}
-
-private boolean isSymmetric(TreeNode t1, TreeNode t2) {
-    if (t1 == null && t2 == null) return true;
-    if (t1 == null || t2 == null) return false;
-    if (t1.val != t2.val) return false;
-    return isSymmetric(t1.left, t2.right) && isSymmetric(t1.right, t2.left);
-}
+```python3
+class Solution:
+    def isSymmetric(self, root: TreeNode) -> bool:
+        def isMirror(t1: TreeNode, t2: TreeNode):
+            if t1 is None and t2 is None:
+                return True
+            if (not t1) or (not t2):
+                return False
+            if t1.val != t2.val:
+                return False
+            return isMirror(t1.left, t2.right) and isMirror(t1.right, t2.left)
+        if root is None:
+            return True
+        return isMirror(root.left, root.right)
 ```
 
 ## 10. 最小路径
@@ -335,14 +353,20 @@ private boolean isSymmetric(TreeNode t1, TreeNode t2) {
 
 树的根节点到叶子节点的最小路径长度
 
-```java
-public int minDepth(TreeNode root) {
-    if (root == null) return 0;
-    int left = minDepth(root.left);
-    int right = minDepth(root.right);
-    if (left == 0 || right == 0) return left + right + 1;
-    return Math.min(left, right) + 1;
-}
+```python3
+class Solution:
+    def minDepth(self, root: TreeNode) -> int:
+        #  2
+        # /
+        #1
+        # 这种情况depth是2，因为2不是leaf node
+        if root is None:
+            return 0
+        l = self.minDepth(root.left)
+        r = self.minDepth(root.right)       
+        if l == 0 or r == 0: #左子树，或者右子树，至少有一个没有
+            return l+r+1    # 这里return很巧妙了，也= max(l,r)+1
+        return min(l,r)+1
 ```
 
 ## 11. 统计左叶子节点的和
@@ -361,22 +385,25 @@ public int minDepth(TreeNode root) {
 There are two left leaves in the binary tree, with values 9 and 15 respectively. Return 24.
 ```
 
-```java
-public int sumOfLeftLeaves(TreeNode root) {
-    if (root == null) return 0;
-    if (isLeaf(root.left)) return root.left.val + sumOfLeftLeaves(root.right);
-    return sumOfLeftLeaves(root.left) + sumOfLeftLeaves(root.right);
-}
-
-private boolean isLeaf(TreeNode node){
-    if (node == null) return false;
-    return node.left == null && node.right == null;
-}
+```python3: 这题第二次做思路不对，注意
+class Solution:
+    def sumOfLeftLeaves(self, root: TreeNode) -> int:
+        if root is None:
+            return 0
+        if root.left and self.isLeaf(root.left):
+            return root.left.val + self.sumOfLeftLeaves(root.right)
+        return self.sumOfLeftLeaves(root.left) + self.sumOfLeftLeaves(root.right)
+            
+    def isLeaf(self, node: TreeNode):
+        if node is None:
+            return False
+        if node.left is None and node.right is None:
+            return True
 ```
 
 ## 12. 相同节点值的最大路径长度
 
-687\. Longest Univalue Path (Easy)
+687\. Longest Univalue Path (Easy) *
 
 [Leetcode](https://leetcode.com/problems/longest-univalue-path/) / [力扣](https://leetcode-cn.com/problems/longest-univalue-path/)
 
@@ -391,22 +418,44 @@ Output : 2
 ```
 
 ```java
-private int path = 0;
-
-public int longestUnivaluePath(TreeNode root) {
-    dfs(root);
-    return path;
-}
-
-private int dfs(TreeNode root){
-    if (root == null) return 0;
-    int left = dfs(root.left);
-    int right = dfs(root.right);
-    int leftPath = root.left != null && root.left.val == root.val ? left + 1 : 0;
-    int rightPath = root.right != null && root.right.val == root.val ? right + 1 : 0;
-    path = Math.max(path, leftPath + rightPath);
-    return Math.max(leftPath, rightPath);
-}
+class Solution:
+    ans = 0
+    def longestUnivaluePath(self, root: TreeNode) -> int:
+        # case1
+        #     a
+        #    /
+        #   a
+        #  / \
+        # a  ~a
+        # pathLenght = longestUnivaluePath(root.left)  + 1
+        
+        # case 2
+        #     a
+        #    /
+        #   a
+        #  / \
+        # a   a
+        # 需要特殊处理：ans是可以+2 求最大大值，但返回只能单边返回
+        # ans = max(ans, lUP(root.left) + 1 + lUP(root.right) + 1)   ans 取最大值可以两边都算
+        # return max(lUP(root.left), lUP(root.right)) + 1       但返回时只能反一边的长度，用于上面节点的计算
+        if root is None:
+            return 0
+        self.getPath(root)
+        return self.ans
+        
+    def getPath(self, root):
+        if root is None:
+            return 0
+        l = self.getPath(root.left)
+        r = self.getPath(root.right)
+        lp = 0
+        rp = 0
+        if root.left and root.val == root.left.val:
+            lp = l + 1
+        if root.right and root.val == root.right.val:
+            rp = r + 1
+        self.ans = max(self.ans, lp + rp)
+        return max(lp, rp)
 ```
 
 ## 13. 间隔遍历
@@ -424,15 +473,34 @@ private int dfs(TreeNode root){
 Maximum amount of money the thief can rob = 3 + 3 + 1 = 7.
 ```
 
-```java
-public int rob(TreeNode root) {
-    if (root == null) return 0;
-    int val1 = root.val;
-    if (root.left != null) val1 += rob(root.left.left) + rob(root.left.right);
-    if (root.right != null) val1 += rob(root.right.left) + rob(root.right.right);
-    int val2 = rob(root.left) + rob(root.right);
-    return Math.max(val1, val2);
-}
+```python3
+class Solution:
+    def rob(self, root: TreeNode) -> int:
+        #本节点+孙子更深节点 vs 儿子节点+重孙更深的节点的比较
+        # val1 = 本节点+孙子节点及更深节点
+        # val2 = 儿子节点+重孙节点及更深节点
+        
+        # 解法1: 超时。。。
+        # if root is None:
+        #     return 0
+        # val1 = root.val
+        # if root.left: 
+        #     val1 += self.rob(root.left.left) + self.rob(root.left.right)
+        # if root.right:
+        #     val1 += self.rob(root.right.left) + self.rob(root.right.right)
+        # val2 = self.rob(root.left) + self.rob(root.right)
+        # return max(val1, val2)
+    
+        # 解法2,从解法1 衍生过来
+        # 这个解法是用来理解递归很好的
+        def rob(root):
+            if root is None: return 0,0,0
+            l,ll,lr = rob(root.left)    #与返回处代码对应，l 对应 max, ll对应 l, lr对应r 
+            r,rl,rr = rob(root.right)
+            return max(root.val+ll+lr+rl+rr, l + r), l, r  # return 除，左子节点计算得到值后，递归返回。若当前节点做为左节点返回，当前节点的l，其实是返回后节点的ll。同样，右子节点r，递归返回到父节点中lr
+        
+        return rob(root)[0]
+            
 ```
 
 ## 14. 找出二叉树中第二小的节点
@@ -1055,62 +1123,59 @@ Trie，又称前缀树或字典树，用于判断字符串是否存在或者是�
 
 [Leetcode](https://leetcode.com/problems/implement-trie-prefix-tree/description/) / [力扣](https://leetcode-cn.com/problems/implement-trie-prefix-tree/description/)
 
-```java
-class Trie {
+```python3
+class Trie:
+    
+    class TrieNode:
+        def __init__(self):
+            self.is_word = False
+            self.children = [None]*26  # use list instead of hash, could make it fast
 
-    private class Node {
-        Node[] childs = new Node[26];
-        boolean isLeaf;
-    }
+    def __init__(self):
+        """
+        Initialize your data structure here.
+        """
+        self.root = Trie.TrieNode()
+        
 
-    private Node root = new Node();
+    def insert(self, word: str) -> None:
+        """
+        Inserts a word into the trie.
+        """
+        p = self.root
+        for c in word:
+            index = ord(c) - ord('a') # ord returns an integer representing the Unicode character
+            if p.children[index] is None:
+                p.children[index] = Trie.TrieNode()   # use default value of TrieNode
+            p = p.children[index]
+        p.is_word = True
 
-    public Trie() {
-    }
+    def search(self, word: str) -> bool:
+        """
+        Returns if the word is in the trie.
+        """
+        p = self.root
+        result = self.find(word)
+        if result: return result.is_word
+        return False
+        
 
-    public void insert(String word) {
-        insert(word, root);
-    }
-
-    private void insert(String word, Node node) {
-        if (node == null) return;
-        if (word.length() == 0) {
-            node.isLeaf = true;
-            return;
-        }
-        int index = indexForChar(word.charAt(0));
-        if (node.childs[index] == null) {
-            node.childs[index] = new Node();
-        }
-        insert(word.substring(1), node.childs[index]);
-    }
-
-    public boolean search(String word) {
-        return search(word, root);
-    }
-
-    private boolean search(String word, Node node) {
-        if (node == null) return false;
-        if (word.length() == 0) return node.isLeaf;
-        int index = indexForChar(word.charAt(0));
-        return search(word.substring(1), node.childs[index]);
-    }
-
-    public boolean startsWith(String prefix) {
-        return startWith(prefix, root);
-    }
-
-    private boolean startWith(String prefix, Node node) {
-        if (node == null) return false;
-        if (prefix.length() == 0) return true;
-        int index = indexForChar(prefix.charAt(0));
-        return startWith(prefix.substring(1), node.childs[index]);
-    }
-
-    private int indexForChar(char c) {
-        return c - 'a';
-    }
-}
+    def startsWith(self, prefix: str) -> bool:
+        """
+        Returns if there is any word in the trie that starts with the given prefix.
+        """
+        p = self.root
+        result = self.find(prefix)
+        return result is not None
+        
+    def find(self, prefix):
+        p = self.root
+        for c in prefix:
+            index = ord(c) - ord('a')
+            if p.children[index] is None: 
+                return None
+            p = p.children[index]
+        return p
 ```
 
 ## 2. 实现一个 Trie，用来求前缀和
@@ -1126,58 +1191,40 @@ Input: insert("app", 2), Output: Null
 Input: sum("ap"), Output: 5
 ```
 
-```java
-class MapSum {
+```python3
+class MapSum:
+    class TreeNode:
+        def __init__(self):
+            self.map_sum = 0
+            self.children = [None]*26
 
-    private class Node {
-        Node[] child = new Node[26];
-        int value;
-    }
+    def __init__(self):
+        """
+        Initialize your data structure here.
+        """
+        self.root = MapSum.TreeNode()
+        self.string_value = {}
+        
 
-    private Node root = new Node();
-
-    public MapSum() {
-
-    }
-
-    public void insert(String key, int val) {
-        insert(key, root, val);
-    }
-
-    private void insert(String key, Node node, int val) {
-        if (node == null) return;
-        if (key.length() == 0) {
-            node.value = val;
-            return;
-        }
-        int index = indexForChar(key.charAt(0));
-        if (node.child[index] == null) {
-            node.child[index] = new Node();
-        }
-        insert(key.substring(1), node.child[index], val);
-    }
-
-    public int sum(String prefix) {
-        return sum(prefix, root);
-    }
-
-    private int sum(String prefix, Node node) {
-        if (node == null) return 0;
-        if (prefix.length() != 0) {
-            int index = indexForChar(prefix.charAt(0));
-            return sum(prefix.substring(1), node.child[index]);
-        }
-        int sum = node.value;
-        for (Node child : node.child) {
-            sum += sum(prefix, child);
-        }
-        return sum;
-    }
-
-    private int indexForChar(char c) {
-        return c - 'a';
-    }
-}
+    def insert(self, key: str, val: int) -> None:
+        delta = val - self.string_value.get(key,0) # deal with case: the same string override the value
+        p = self.root
+        for c in key:
+            index = ord(c) - ord('a')
+            if p.children[index] is None:
+                p.children[index] = MapSum.TreeNode()
+            p = p.children[index]
+            p.map_sum += delta
+        self.string_value[key] = val
+        
+    def sum(self, prefix: str) -> int:
+        p = self.root
+        for c in prefix:
+            index = ord(c) - ord('a')
+            if p.children[index] is None:
+                return 0
+            p = p.children[index]
+        return p.map_sum
 ```
 
 

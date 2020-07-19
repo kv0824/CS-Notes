@@ -113,28 +113,23 @@ Given s = "leetcode", return "leotcede".
 
 <div align="center"> <img src="https://cs-notes-1256109796.cos.ap-guangzhou.myqcloud.com/ef25ff7c-0f63-420d-8b30-eafbeea35d11.gif" width="400px"> </div><br>
 
-```java
-private final static HashSet<Character> vowels = new HashSet<>(
-        Arrays.asList('a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U'));
-
-public String reverseVowels(String s) {
-    if (s == null) return null;
-    int i = 0, j = s.length() - 1;
-    char[] result = new char[s.length()];
-    while (i <= j) {
-        char ci = s.charAt(i);
-        char cj = s.charAt(j);
-        if (!vowels.contains(ci)) {
-            result[i++] = ci;
-        } else if (!vowels.contains(cj)) {
-            result[j--] = cj;
-        } else {
-            result[i++] = cj;
-            result[j--] = ci;
-        }
-    }
-    return new String(result);
-}
+```puthon
+class Solution:
+    def reverseVowels(self, s: str) -> str:
+        vowels = "aeiou"
+        i = 0
+        j = len(s)-1
+        s = list(s)
+        while i < j:
+            if s[i].lower() not in vowels:
+                i += 1
+            elif s[j].lower() not in vowels:
+                j -= 1
+            else:
+                s[i], s[j] = s[j], s[i]
+                i += 1
+                j -= 1
+        return ''.join(s)
 ```
 
 # 4. 回文字符串
@@ -165,24 +160,29 @@ Explanation: You could delete the character 'c'.
 
 <div align="center"> <img src="https://cs-notes-1256109796.cos.ap-guangzhou.myqcloud.com/db5f30a7-8bfa-4ecc-ab5d-747c77818964.gif" width="300px"> </div><br>
 
-```java
-public boolean validPalindrome(String s) {
-    for (int i = 0, j = s.length() - 1; i < j; i++, j--) {
-        if (s.charAt(i) != s.charAt(j)) {
-            return isPalindrome(s, i, j - 1) || isPalindrome(s, i + 1, j);
-        }
-    }
-    return true;
-}
-
-private boolean isPalindrome(String s, int i, int j) {
-    while (i < j) {
-        if (s.charAt(i++) != s.charAt(j--)) {
-            return false;
-        }
-    }
-    return true;
-}
+```python3
+class Solution:
+    def validPalindrome(self, s: str) -> bool:
+        i = 0 
+        j = len(s) - 1
+        while i < j:
+            if s[i] != s[j]:
+                # return self.isPalindrome(s[i+1:j]) or self.isPalindrome(s[i:j]-1) #错误答案
+                return self.isPalindrome(s[i+1:j+1]) or self.isPalindrome(s[i:j]) #正确答案
+            else:
+                i += 1
+                j -= 1
+        return True
+                
+    def isPalindrome(self, s: str) -> bool:
+        i = 0
+        j = len(s) -1
+        while i < j:
+            if s[i] != s[j]:
+                return False
+            i += 1
+            j -= 1
+        return True
 ```
 
 # 5. 归并两个有序数组
@@ -203,22 +203,21 @@ Output: [1,2,2,3,5,6]
 
 需要从尾开始遍历，否则在 nums1 上归并得到的值会覆盖还未进行归并比较的值。
 
-```java
-public void merge(int[] nums1, int m, int[] nums2, int n) {
-    int index1 = m - 1, index2 = n - 1;
-    int indexMerge = m + n - 1;
-    while (index1 >= 0 || index2 >= 0) {
-        if (index1 < 0) {
-            nums1[indexMerge--] = nums2[index2--];
-        } else if (index2 < 0) {
-            nums1[indexMerge--] = nums1[index1--];
-        } else if (nums1[index1] > nums2[index2]) {
-            nums1[indexMerge--] = nums1[index1--];
-        } else {
-            nums1[indexMerge--] = nums2[index2--];
-        }
-    }
-}
+```python3
+class Solution:
+    def merge(self, nums1: List[int], m: int, nums2: List[int], n: int) -> None:
+        """
+        Do not return anything, modify nums1 in-place instead.
+        """
+        while m > 0 and n > 0:
+            if nums1[m-1] < nums2[n-1]:
+                nums1[m+n-1] = nums2[n-1]
+                n -= 1
+            else:
+                nums1[m+n-1] = nums1[m-1]
+                m -= 1
+        if n > 0:
+            nums1[:n] = nums2[:n]
 ```
 
 # 6. 判断链表是否存在环
@@ -264,31 +263,30 @@ Output:
 
 通过删除字符串 s 中的一个字符能得到字符串 t，可以认为 t 是 s 的子序列，我们可以使用双指针来判断一个字符串是否为另一个字符串的子序列。
 
-```java
-public String findLongestWord(String s, List<String> d) {
-    String longestWord = "";
-    for (String target : d) {
-        int l1 = longestWord.length(), l2 = target.length();
-        if (l1 > l2 || (l1 == l2 && longestWord.compareTo(target) < 0)) {
-            continue;
-        }
-        if (isSubstr(s, target)) {
-            longestWord = target;
-        }
-    }
-    return longestWord;
-}
-
-private boolean isSubstr(String s, String target) {
-    int i = 0, j = 0;
-    while (i < s.length() && j < target.length()) {
-        if (s.charAt(i) == target.charAt(j)) {
-            j++;
-        }
-        i++;
-    }
-    return j == target.length();
-}
+```python3
+class Solution:
+    def findLongestWord(self, s: str, d: List[str]) -> str:
+        self.ans = ""
+        for word in d:
+            if self.isInDictionary(s, word):
+                if len(self.ans) < len(word):
+                    self.ans = word
+                elif len(self.ans) == len(word) and self.ans > word:
+                    self.ans = word
+        return self.ans
+    
+    def isInDictionary(self, s, t):
+        if len(s) - 1 < len(t) - 1:
+            return False
+        i = j = 0
+        while i < len(s) and j < len(t):
+            if s[i] == t[j]:
+                i += 1
+                j += 1
+            else:
+                i+= 1
+        return j == len(t)
+        
 ```
 
 
